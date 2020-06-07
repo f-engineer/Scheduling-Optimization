@@ -62,6 +62,7 @@ class ScheduleOpt(GenericScheduleOpt):
 
         C_2 = model.addConstrs((quicksum(Y_sxt[(s, x, t)] for x in self.X_s[s]) <= 1
                                 for s in self.S for t in self.T), "")
+        #FARAM: What about overlapping time slots? Shouldnt the quicksum include all overalapping time slots?
 
         C_3 = model.addConstrs((quicksum(X_xrt[(x, r, t)] for x in self.X_r[r]) <= 1
                                 for r in self.R for t in self.T), "")
