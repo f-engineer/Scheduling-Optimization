@@ -31,6 +31,7 @@ class RoomAssignmentOpt(GenericScheduleOpt):
         self.p_x = sp.get_enrollement_per_section(self.course_data,
                                                   enrollment_column='Adjusted Enrollment After Combining Cross-Listed Sections'
                                                   )
+        #FARAM: is this actual capacity or effective capacity? if the latter, what is the density related to this effective capacity?
         self.n_r = sp.get_room_capacity(self.room_data)
         self.t_x = sp.get_course_time(self.course_data)
         pass
@@ -40,6 +41,8 @@ class RoomAssignmentOpt(GenericScheduleOpt):
         X_xr = {}
         for x in self.X:
             for r in self.R_x[x]:
+                #FARAM: how are we restricting x to only compatible rooms (e.g., labs etc.?)
+                # are we assuming all possible section to room combinations?
                 X_xr[(x, r)] = model.addVar(vtype=GRB.BINARY, name='X_xr[%s+%s]' % (x, r))
 
         model_vars = {"X_xr": X_xr}
@@ -66,6 +69,8 @@ class RoomAssignmentOpt(GenericScheduleOpt):
     def set_objective(self, model, model_vars):
         print("setting objective")
         X_xr = model_vars["X_xr"]
+        #FARAM: this will minimize the average density. Are there no hard constraints on the maximum density for a class?
+        # for example, a 6' spacing would be a max density and anything below this would be unacceptable.
         model.setObjective(quicksum(self.p_x[x] / self.n_r[r] * X_xr[(x, r)] for x in self.X for r in self.R_x[x]), GRB.MINIMIZE)
         return
 
