@@ -38,11 +38,16 @@ def get_student_sets(student_data, X):
     for row in student_data.iterrows():
         s_courses = []
         for c in course_columns:
+            #FARAM: perhaps use an optional argument to get_student_sets that takes a string such as ISYE to filter classes
+            # so that this is not hard coded into the set generation
             if "ISYE" in row[1][c]:
                 templist = row[1][c].split()
                 course_section = '_'.join(templist[:3])
                 for i in range(3):
+                    #FARAM: is this standard form conversion used elsewhere? if so, make it a lambda/inline expression that can be reused
+                    #FARAM: im not understanding.. wouldnt for i in range(3): + "_" + str(i) lead to _0_1_2?
                     standard_form = course_section + "_" + str(i)
+                    #FARAM: what is the emaning of standard_form not being in X. It seems to me that this is an exception.
                     if standard_form in X:
                         s_courses.append(standard_form)
         X_s[row[1]["SYSGENID"]] = s_courses
@@ -51,6 +56,7 @@ def get_student_sets(student_data, X):
     for s, x in X_s.items():
         cou = set()
         for i in x:
+            #FARAM: so the implicit assumption is that a student is enrolled in at most 9 courses? is this assumption explict in student_data?
             cou.add(i[:9])
         C_s[s] = list(cou)
     return X_s, C_s
@@ -175,8 +181,9 @@ def get_overlapping_time_slots(T, t):
 
     T_clash = set()
     for t_other in T:
+        #FARAM: why would t_other be a float and not of the form in the comment above?
         if type(t_other) is float:
-            continue
+            continue        
         t_other_dow, t_other_start_time, t_other_end_time = t_other.split("_")
         t_other_dow = set(t_other_dow)
         
